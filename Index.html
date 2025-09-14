@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Happy Birthday Dad</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      background-color: black;
+    }
+
+    canvas {
+      display: block;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: black;
+      max-width: 100vw;
+      max-height: 100vh;
+    }
+
+    #intro-message,
+    #click-hint,
+    #message-box,
+    #video-button {
+      position: absolute;
+      z-index: 10;
+      text-align: center;
+      transition: opacity 2s ease;
+    }
+
+    #intro-message {
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      font-size: 1.6em;
+      opacity: 1;
+      color: #f9e79f; /* fun yellow */
+    }
+
+    #click-hint {
+      top: 90%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.2em;
+      font-family: 'Courier New', monospace;
+      opacity: 0;
+      color: #58d68d; /* green hint */
+    }
+
+    #message-box {
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      font-size: 1.8em;
+      opacity: 0;
+      color: #fdfefe;
+      text-shadow: 0px 0px 6px #f4d03f;
+    }
+
+    #video-button {
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+    }
+
+    #video-button button {
+      background: #f39c12;
+      border: none;
+      padding: 12px 20px;
+      font-size: 1.2em;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+      box-shadow: 0px 0px 10px #f1c40f;
+      transition: transform 0.2s ease, background 0.3s ease;
+    }
+
+    #video-button button:hover {
+      transform: scale(1.1);
+      background: #e67e22;
+    }
+  </style>
+
+  <!-- External Scripts -->
+  <script src="./file/jquery.min.js"></script>
+  <script src="./file/jscex.min.js"></script>
+  <script src="./file/jscex-parser.js"></script>
+  <script src="./file/jscex-jit.js"></script>
+  <script src="./file/jscex-builderbase.min.js"></script>
+  <script src="./file/jscex-async.min.js"></script>
+  <script src="./file/jscex-async-powerpack.min.js"></script>
+  <script src="./file/functions.js" charset="utf-8"></script>
+  <script src="./file/love.js" charset="utf-8"></script>
+</head>
+<body>
+
+  <div id="intro-message">
+    Dad, ready for a birthday surprise? 🎉
+  </div>
+
+  <div id="click-hint">Click to grow your birthday tree 🌳</div>
+  <div id="message-box"></div>
+  <div id="video-button">
+    <button onclick="playVideo()">▶ Play Video 🎥</button>
+  </div>
+
+  <canvas id="canvas" width="1100" height="680"></canvas>
+
+  <script>
+    function playVideo() {
+      // Replace with your video link
+      window.location.href = "https://your-custom-video-link.com";
+    }
+
+    (function () {
+      var canvas = $('#canvas');
+
+      if (!canvas[0].getContext) {
+        alert("Canvas not supported!");
+        return false;
+      }
+
+      var width = 1100;
+      var height = 680;
+      canvas.attr("width", width);
+      canvas.attr("height", height);
+
+      var opts = {
+        seed: {
+          x: width / 2 - 20,
+          color: "rgb(46, 204, 113)", // green for fun vibe
+          scale: 2
+        },
+        branch: [
+          [535, 680, 570, 250, 500, 200, 30, 100, [
+            [540, 500, 455, 417, 340, 400, 13, 100, [
+              [450, 435, 434, 430, 394, 395, 2, 40]
+            ]],
+            [550, 445, 600, 356, 680, 345, 12, 100, [
+              [578, 400, 648, 409, 661, 426, 3, 80]
+            ]],
+            [539, 281, 537, 248, 534, 217, 3, 40],
+            [546, 397, 413, 247, 328, 244, 9, 80, [
+              [427, 286, 383, 253, 371, 205, 2, 40],
+              [498, 345, 435, 315, 395, 330, 4, 60]
+            ]],
+            [546, 357, 608, 252, 678, 221, 6, 100, [
+              [590, 293, 646, 277, 648, 271, 2, 80]
+            ]]
+          ]]
+        ],
+        bloom: {
+          num: 700,
+          width: 1080,
+          height: 650
+        },
+        footer: {
+          width: 1200,
+          height: 5,
+          speed: 10
+        }
+      };
+
+      var tree = new Tree(canvas[0], width, height, opts);
+      var seed = tree.seed;
+      var foot = tree.footer;
+      var hold = 1;
+
+      var seedAnimate = eval(Jscex.compile("async", function () {
+        seed.draw();
+        while (hold) {
+          $await(Jscex.Async.sleep(10));
+        }
+        while (seed.canScale()) {
+          seed.scale(0.95);
+          $await(Jscex.Async.sleep(10));
+        }
+        while (seed.canMove()) {
+          seed.move(0, 2);
+          foot.draw();
+          $await(Jscex.Async.sleep(10));
+        }
+      }));
+
+      var growAnimate = eval(Jscex.compile("async", function () {
+        do {
+          tree.grow();
+          $await(Jscex.Async.sleep(10));
+        } while (tree.canGrow());
+      }));
+
+      var flowAnimate = eval(Jscex.compile("async", function () {
+        do {
+          tree.flower(2);
+          $await(Jscex.Async.sleep(10));
+        } while (tree.canFlower());
+      }));
+
+      var runAsync = eval(Jscex.compile("async", function () {
+        hold = 0;
+        $await(seedAnimate());
+        $await(growAnimate());
+        $await(flowAnimate());
+
+        $await(Jscex.Async.sleep(2000));
+        $("#message-box").css("opacity", "1").html("Happy Birthday, Dad! 🎂🎉").typewriter();
+
+        setTimeout(function () {
+          $("#message-box").html("You’re the coolest person I know!! 😎").typewriter();
+        }, 5000);
+
+        setTimeout(function () {
+          $("#message-box").html("Now, click below for the real surprise 👇🏼").typewriter();
+          $("#video-button").css("opacity", "1");
+        }, 10000);
+      }));
+
+      // Intro fade
+      setTimeout(() => $('#intro-message').css('opacity', '0'), 4000);
+      setTimeout(() => $('#click-hint').css('opacity', '1'), 6000);
+
+      var animationStarted = false;
+      canvas.on('click', function () {
+        if (!animationStarted) {
+          animationStarted = true;
+          $('#click-hint').css('opacity', '0');
+          runAsync().start();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
